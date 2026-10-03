@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ff6fa9">
+  <meta name="description" content="มีคำถามสำคัญจากใจ... เธอจะรับรักเราไหม">
+  <title>เธอจะรับรักเราไหม 💗</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ff6fa9'/%3E%3Cpath d='M32 51S10 38 10 23c0-12 15-15 22-5 7-10 22-7 22 5 0 15-22 28-22 28Z' fill='white'/%3E%3C/svg%3E">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+    :root {
+      --pink-50: #fff6fa;
+      --pink-100: #ffe2ed;
+      --pink-200: #ffc3da;
+      --pink-400: #ff6fa9;
+      --pink-500: #f84f94;
+      --pink-700: #a91f5b;
+      --ink: #55203b;
+      --white: #fffdfd;
+      --shadow: 0 28px 70px rgba(171, 31, 91, .2);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      overflow: hidden;
+      color: var(--ink);
+      font-family: "Noto Sans Thai", sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,255,255,.9) 0 6%, transparent 17%),
+        radial-gradient(circle at 90% 85%, #ffc0d8 0 4%, transparent 22%),
+        linear-gradient(145deg, #fff6fa 0%, #ffd4e5 52%, #ffb7d2 100%);
+    }
+
+    .ambient, .confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: absolute;
+      color: rgba(248, 79, 148, .2);
+      font-size: clamp(1.4rem, 3vw, 2.8rem);
+      animation: drift 8s ease-in-out infinite;
+    }
+
+    .heart:nth-child(1) { left: 6%; top: 12%; transform: rotate(-14deg); }
+    .heart:nth-child(2) { right: 9%; top: 9%; animation-delay: -2s; }
+    .heart:nth-child(3) { left: 12%; bottom: 9%; animation-delay: -4s; }
+    .heart:nth-child(4) { right: 7%; bottom: 17%; animation-delay: -6s; }
+
+    main {
+      position: relative;
+      z-index: 10;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 27vh 24px 4vh;
+    }
+
+    .card {
+      position: relative;
+      width: min(640px, 100%);
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 0;
+      text-align: center;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    h1 {
+      width: max-content;
+      max-width: 96vw;
+      margin: 0;
+      font: 700 clamp(1.45rem, 5.5vw, 4rem)/1.12 "Mali", sans-serif;
+      letter-spacing: -.05em;
+      color: var(--pink-700);
+      white-space: nowrap;
+    }
+
+    .subcopy {
+      margin: -8px 0 4px;
+      font-size: clamp(1rem, 2.8vw, 1.18rem);
+      color: #8d4b69;
+    }
+
+    .actions {
+      position: relative;
+      width: min(650px, 94vw);
+      min-height: 180px;
+    }
+
+    button {
+      border: 0;
+      font: 700 1.1rem "Mali", sans-serif;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, left .25s cubic-bezier(.2,.85,.25,1), top .25s cubic-bezier(.2,.85,.25,1);
+    }
+
+    button:focus-visible {
+      outline: 4px solid rgba(169, 31, 91, .25);
+      outline-offset: 4px;
+    }
+
+    .yes {
+      position: absolute;
+      left: 16%;
+      top: 34px;
+      width: 150px;
+      height: 62px;
+      color: #fff;
+      background: linear-gradient(135deg, #ff70a9, #e72f7e);
+      border-radius: 22px;
+      box-shadow: 0 14px 28px rgba(231, 47, 126, .3);
+    }
+
+    .yes:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 18px 34px rgba(231, 47, 126, .38); }
+
+    .no {
+      position: absolute;
+      left: 58%;
+      top: 42px;
+      width: 116px;
+      height: 54px;
+      color: #8a506a;
+      background: #fff;
+      border: 2px solid var(--pink-200);
+      border-radius: 18px;
+      box-shadow: 0 10px 22px rgba(117, 52, 81, .12);
+      touch-action: none;
+    }
+
+    .cry-preview {
+      position: fixed;
+      z-index: 9;
+      left: 50%;
+      top: 17vh;
+      width: min(36vw, 310px);
+      max-height: 30vh;
+      object-fit: contain;
+      transform: translate(-50%, -38%) scale(.4) rotate(7deg);
+      opacity: 0;
+      transition: transform .45s cubic-bezier(.2, .9, .2, 1.15), opacity .25s ease;
+    }
+
+    .cry-preview.show { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+
+    .letter-screen {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: radial-gradient(circle at 50% 40%, #fff5f9, #ffb9d4);
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.03);
+      transition: opacity .45s ease, transform .45s ease, visibility .45s;
+    }
+
+    .letter-screen.open { opacity: 1; visibility: visible; transform: scale(1); }
+
+    .letter {
+      width: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(12px, 2vh, 24px);
+      overflow: hidden;
+      padding: 16px;
+      text-align: center;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .celebrate-img {
+      width: min(72vw, 560px);
+      max-height: 68vh;
+      aspect-ratio: 1;
+      object-fit: contain;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      mix-blend-mode: multiply;
+    }
+
+    .letter h2 {
+      width: max-content;
+      max-width: 98vw;
+      margin: 0;
+      color: var(--pink-700);
+      font: 700 clamp(.85rem, 3.2vw, 2.35rem)/1.2 "Mali", sans-serif;
+      letter-spacing: -.03em;
+      white-space: nowrap;
+    }
+
+    .signature { display: block; margin-top: 20px; color: var(--pink-500); font-weight: 700; }
+
+    .confetti {
+      position: absolute;
+      top: -12vh;
+      width: 10px;
+      height: 18px;
+      border-radius: 3px;
+      animation: fall var(--duration) linear var(--delay) infinite;
+    }
+
+    @keyframes drift { 50% { transform: translateY(-18px) rotate(10deg) scale(1.12); } }
+    @keyframes fall { to { transform: translate3d(var(--sway), 115vh, 0) rotate(900deg); } }
+    @keyframes wiggle { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-7deg); } 70% { transform: rotate(7deg); } }
+
+    @media (max-width: 560px) {
+      main { padding: 28vh 14px 2vh; }
+      .card { gap: 12px; }
+      .actions { width: 94vw; min-height: 160px; }
+      .yes { left: 50%; top: 22px; transform: translateX(-50%); }
+      .yes:hover { transform: translateX(-50%) translateY(-3px) scale(1.03); }
+      .no { left: calc(50% - 58px); top: 82px; }
+      .cry-preview { left: 50%; top: 15vh; width: min(54vw, 240px); max-height: 27vh; }
+    }
+
+    @media (min-width: 561px) and (max-width: 900px) {
+      main { padding-top: 29vh; }
+      .cry-preview { left: 50%; top: 16vh; width: min(42vw, 280px); max-height: 29vh; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>
+  </div>
+
+  <main>
+    <section class="card" aria-labelledby="question">
+      <h1 id="question">เธอจะรับรักเราไหม?</h1>
+      <p class="subcopy" id="hint">เรารวบรวมความกล้ามาถามแล้วนะ</p>
+      <div class="actions" id="playground">
+        <button class="yes" id="yesBtn" type="button">Yes 💖</button>
+        <button class="no" id="noBtn" type="button">No</button>
+      </div>
+    </section>
+  </main>
+
+  <img class="cry-preview" id="cryPreview" src="assets/crying-cutout.png" alt="ตัวการ์ตูนกำลังร้องไห้เสียใจ">
+
+  <section class="letter-screen" id="letterScreen" aria-hidden="true" aria-live="polite">
+    <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
+    <article class="letter">
+      <img class="celebrate-img" src="assets/yes-dog.png" alt="น้องหมาตาโตใส่ชุดเอี๊ยมยีนส์">
+      <h2>เย้! ขอบคุณน้าาาาที่รักกันค้าบเบ้บบ............</h2>
+    </article>
+  </section>
+
+  <script>
+    const noBtn = document.querySelector('#noBtn');
+    const yesBtn = document.querySelector('#yesBtn');
+    const playground = document.querySelector('#playground');
+    const hint = document.querySelector('#hint');
+    const cryPreview = document.querySelector('#cryPreview');
+    const letterScreen = document.querySelector('#letterScreen');
+    const confettiLayer = document.querySelector('#confetti');
+    const pleas = ['เดี๋ยวก่อนนน 🥺', 'ลองคิดอีกทีนะ 😭', 'ใจร้ายไม่ลงหรอกเนอะ', 'ปุ่มนี้กดไม่ได้หรอก 💔'];
+    let escapeCount = 0;
+
+    function dodgeNo() {
+      const area = playground.getBoundingClientRect();
+      const maxX = Math.max(0, area.width - noBtn.offsetWidth);
+      const maxY = Math.max(0, area.height - noBtn.offsetHeight);
+      const currentX = noBtn.offsetLeft;
+      const currentY = noBtn.offsetTop;
+      let x;
+      let y;
+      let tries = 0;
+
+      do {
+        x = Math.random() * maxX;
+        y = Math.random() * maxY;
+        tries += 1;
+      } while (Math.hypot(x - currentX, y - currentY) < Math.min(180, area.width * .32) && tries < 18);
+
+      noBtn.style.position = 'absolute';
+      noBtn.style.zIndex = '2';
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+      noBtn.style.animation = 'wiggle .35s ease';
+      setTimeout(() => { noBtn.style.animation = ''; }, 360);
+
+      cryPreview.classList.add('show');
+      hint.textContent = pleas[escapeCount % pleas.length];
+      escapeCount += 1;
+      setTimeout(() => {
+        cryPreview.classList.remove('show');
+      }, 1700);
+    }
+
+    function celebrate() {
+      letterScreen.classList.add('open');
+      letterScreen.setAttribute('aria-hidden', 'false');
+      confettiLayer.replaceChildren();
+      const colors = ['#f84f94', '#ffb000', '#8b5cf6', '#2dd4bf', '#ffffff'];
+      for (let i = 0; i < 90; i += 1) {
+        const piece = document.createElement('i');
+        piece.className = 'confetti';
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.setProperty('--duration', `${2.8 + Math.random() * 3}s`);
+        piece.style.setProperty('--delay', `${Math.random() * -5}s`);
+        piece.style.setProperty('--sway', `${-80 + Math.random() * 160}px`);
+        confettiLayer.append(piece);
+      }
+    }
+
+    noBtn.addEventListener('pointerenter', dodgeNo);
+    noBtn.addEventListener('pointerdown', (event) => { event.preventDefault(); dodgeNo(); });
+    noBtn.addEventListener('click', dodgeNo);
+    noBtn.addEventListener('focus', () => { if (document.body.matches(':focus-visible')) dodgeNo(); });
+    yesBtn.addEventListener('click', celebrate);
+
+    if (document.modelContext?.registerTool) {
+      const lifecycle = new AbortController();
+      document.modelContext.registerTool({
+        name: 'answer_love_question',
+        title: 'ตอบรับความรัก',
+        description: 'เลือกคำตอบ Yes เพื่อเปิดจดหมายขอบคุณและเริ่มฉากฉลอง',
+        inputSchema: {
+          type: 'object',
+          properties: { answer: { type: 'string', enum: ['yes'] } },
+          required: ['answer'],
+          additionalProperties: false
+        },
+        annotations: { readOnlyHint: false, untrustedContentHint: false },
+        execute(input) {
+          if (!input || input.answer !== 'yes') throw new Error('คำตอบที่รองรับคือ yes เท่านั้น');
+          celebrate();
+          return { answer: 'yes', celebration: true, message: 'ขอบคุณนะครับที่รับรักเรา' };
+        }
+      }, { signal: lifecycle.signal });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffd9e8" />
+    <title>Happy Aniversary</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23ff5f96' d='M32 55 8 31C-7 15 17-5 32 13 47-5 71 15 56 31Z'/%3E%3C/svg%3E" />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Noto Sans Thai", "Leelawadee UI", system-ui, sans-serif;
+        background: #ffd9e8;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        min-height: 100svh;
+        overflow: hidden;
+      }
+
+      main {
+        position: relative;
+        display: grid;
+        min-height: 100vh;
+        min-height: 100svh;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at 18% 22%, rgba(255,255,255,.76) 0 4px, transparent 5px),
+          radial-gradient(circle at 82% 17%, rgba(255,255,255,.6) 0 6px, transparent 7px),
+          radial-gradient(circle at 12% 79%, rgba(255,255,255,.46) 0 8px, transparent 9px),
+          radial-gradient(circle at 87% 74%, rgba(255,255,255,.7) 0 4px, transparent 5px),
+          linear-gradient(145deg, #fff0f6 0%, #ffd9e8 44%, #ffc2da 100%);
+      }
+
+      .letter {
+        position: relative;
+        width: min(88vw, 460px);
+        height: min(64vw, 330px);
+        max-height: 42vh;
+        border: 0;
+        padding: 0;
+        background: none;
+        cursor: pointer;
+        perspective: 1100px;
+        -webkit-tap-highlight-color: transparent;
+        filter: drop-shadow(0 24px 22px rgba(139, 47, 83, .2));
+      }
+
+      .letter:focus-visible {
+        outline: 4px solid rgba(231, 57, 119, .44);
+        outline-offset: 12px;
+        border-radius: 18px;
+      }
+
+      .envelope-back,
+      .envelope-front,
+      .flap {
+        position: absolute;
+        inset: 0;
+        border-radius: 15px;
+      }
+
+      .envelope-back {
+        background: #ff85ad;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,.28);
+      }
+
+      .card {
+        position: absolute;
+        z-index: 2;
+        left: 12%;
+        right: 12%;
+        bottom: 7%;
+        display: grid;
+        gap: 14px;
+        padding: clamp(14px, 4vw, 22px);
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 8px 26px rgba(111, 35, 67, .18);
+        opacity: 0;
+        transform: translateY(15%);
+        transition: transform 900ms cubic-bezier(.18,.78,.2,1), box-shadow 600ms ease, opacity 260ms ease 180ms;
+      }
+
+      .photo {
+        width: 100%;
+        aspect-ratio: 1 / 1.02;
+        overflow: hidden;
+        border-radius: 12px;
+        background: #f4f4f4;
+      }
+
+      .photo img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: 50% 43%;
+      }
+
+      .message {
+        margin: 0;
+        color: #dc3d78;
+        font-size: clamp(1.18rem, 5vw, 1.7rem);
+        font-weight: 800;
+        line-height: 1.3;
+        text-align: center;
+      }
+
+      .message span { display: block; }
+
+      .envelope-front {
+        z-index: 3;
+        overflow: hidden;
+        background: linear-gradient(150deg, transparent 49.3%, #ff9dbe 50%) left / 51% 100% no-repeat,
+          linear-gradient(210deg, transparent 49.3%, #ffb0ca 50%) right / 51% 100% no-repeat;
+        pointer-events: none;
+      }
+
+      .envelope-front::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 66%;
+        background: linear-gradient(35deg, #ffb8d0 49%, transparent 50%) left / 51% 100% no-repeat,
+          linear-gradient(-35deg, #ffa5c4 49%, transparent 50%) right / 51% 100% no-repeat;
+      }
+
+      .flap {
+        z-index: 4;
+        height: 72%;
+        border-radius: 15px 15px 0 0;
+        background: #ff719f;
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+        transform-origin: top;
+        transition: transform 650ms cubic-bezier(.3,.05,.2,1), z-index 0s 320ms;
+      }
+
+      .seal {
+        position: absolute;
+        z-index: 5;
+        left: 50%;
+        top: 50%;
+        display: grid;
+        width: clamp(58px, 15vw, 76px);
+        aspect-ratio: 1;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: #f0447f;
+        box-shadow: 0 7px 13px rgba(112, 25, 58, .24), inset 0 0 0 4px rgba(255,255,255,.2);
+        font-family: Arial, sans-serif;
+        font-size: clamp(28px, 8vw, 40px);
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 420ms ease, opacity 300ms ease;
+      }
+
+      .letter.open { filter: drop-shadow(0 30px 30px rgba(139, 47, 83, .2)); }
+      .letter.open .flap { z-index: 1; transform: rotateX(180deg); }
+      .letter.open .seal { opacity: 0; transform: translate(-50%, -50%) scale(.35); }
+      .letter.open .card {
+        z-index: 6;
+        opacity: 1;
+        transform: translateY(-45px);
+        box-shadow: 0 24px 50px rgba(111, 35, 67, .22);
+      }
+
+      @media (max-height: 670px) {
+        .letter { width: min(70vw, 340px); height: min(49vw, 238px); }
+        .card { gap: 9px; padding: 12px; }
+        .letter.open .card { transform: translateY(-35px); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card, .flap, .seal { transition-duration: 1ms; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <button class="letter" type="button" aria-label="เปิดจดหมาย" aria-expanded="false">
+        <span class="envelope-back"></span>
+        <span class="card">
+          <span class="photo"><img src="assets/anniversary.png" alt="" /></span>
+          <span class="message"><span>happy aniversary</span><span>รักนะค้าบเบ้บบบ</span></span>
+        </span>
+        <span class="flap"></span>
+        <span class="envelope-front"></span>
+        <span class="seal" aria-hidden="true">♥</span>
+      </button>
+    </main>
+    <script>
+      const letter = document.querySelector('.letter');
+      letter.addEventListener('click', () => {
+        const isOpen = letter.classList.toggle('open');
+        letter.setAttribute('aria-expanded', String(isOpen));
+      });
+    </script>
+  </body>
+</html>

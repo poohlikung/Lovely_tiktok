@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff6b5f" />
+  <meta name="description" content="เกมตีตุ่นจอมป่วน เล่นให้ได้ 12 แต้มใน 30 วินาที!" />
+  <title>ป๊อก! ตีให้ทัน</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ff6b5f'/%3E%3Cellipse cx='32' cy='43' rx='22' ry='9' fill='%236d3b2a'/%3E%3Ccircle cx='32' cy='27' r='16' fill='%23ffd166'/%3E%3Ccircle cx='26' cy='25' r='2.5' fill='%232d1b17'/%3E%3Ccircle cx='38' cy='25' r='2.5' fill='%232d1b17'/%3E%3Cpath d='M25 32q7 7 14 0' fill='none' stroke='%232d1b17' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=Sriracha&display=swap');
+
+    :root {
+      --ink: #2d1b17;
+      --cream: #fff4d6;
+      --red: #ff6b5f;
+      --red-dark: #d94740;
+      --yellow: #ffd166;
+      --green: #7fbe72;
+      --green-dark: #3f794f;
+      --sky: #80d8ec;
+      --soil: #6d3b2a;
+      --soil-dark: #3b241d;
+      --paper: #fffdf7;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: 'Mitr', system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,.8) 0 2px, transparent 3px),
+        radial-gradient(circle at 82% 11%, rgba(255,255,255,.75) 0 3px, transparent 4px),
+        linear-gradient(180deg, #8ee0f1 0 61%, #92cf75 61% 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      z-index: -1;
+      top: 8%;
+      width: 190px;
+      height: 68px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.55);
+      filter: blur(.2px);
+    }
+    body::before { left: -40px; box-shadow: 115px -26px 0 -8px rgba(255,255,255,.55); }
+    body::after { right: -55px; top: 18%; box-shadow: -105px -18px 0 -12px rgba(255,255,255,.48); }
+
+    button { font: inherit; }
+
+    .game-shell {
+      width: min(980px, calc(100% - 28px));
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: 20px 0 24px;
+      display: grid;
+      align-content: center;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      margin: 0;
+      font-family: 'Sriracha', cursive;
+      font-size: clamp(1.55rem, 4vw, 2.35rem);
+      line-height: 1;
+      color: var(--paper);
+      text-shadow: 0 4px 0 var(--red-dark), 0 6px 14px rgba(45,27,23,.18);
+      transform: rotate(-2deg);
+    }
+
+    .status-pill {
+      min-width: 112px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 7px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 999px;
+      box-shadow: 0 5px 0 rgba(45,27,23,.25);
+      font-weight: 600;
+    }
+
+    .status-pill strong { font-size: 1.45rem; line-height: 1; color: var(--red-dark); }
+    .score { justify-self: end; }
+
+    .board-wrap {
+      position: relative;
+      border: 4px solid var(--ink);
+      border-radius: 30px;
+      background: linear-gradient(180deg, #b4dc78 0%, #68aa61 100%);
+      box-shadow: 0 10px 0 rgba(45,27,23,.32), inset 0 0 0 4px rgba(255,255,255,.2);
+      overflow: hidden;
+    }
+
+    .board-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .14;
+      background-image: radial-gradient(#214629 1.1px, transparent 1.1px);
+      background-size: 17px 17px;
+    }
+
+    .game-board {
+      position: relative;
+      min-height: 520px;
+      padding: 34px clamp(16px, 4vw, 54px) 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(18px, 4vw, 38px) clamp(14px, 4vw, 46px);
+      align-items: end;
+    }
+
+    .hole {
+      position: relative;
+      height: 190px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      isolation: isolate;
+    }
+
+    .hole::before {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      left: 2%;
+      right: 2%;
+      bottom: 4px;
+      height: 48px;
+      border: 4px solid var(--soil-dark);
+      border-radius: 50%;
+      background: var(--soil-dark);
+      box-shadow: inset 0 10px 0 rgba(0,0,0,.22), 0 5px 0 rgba(255,255,255,.15);
+    }
+
+    .hole::after {
+      content: '';
+      position: absolute;
+      z-index: 3;
+      left: -2%;
+      right: -2%;
+      bottom: -1px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--soil);
+      border-bottom: 4px solid var(--soil-dark);
+    }
+
+    .target {
+      position: absolute;
+      z-index: 2;
+      width: 88%;
+      height: 168px;
+      bottom: 18px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32"%3E%3Ctext y="25" font-size="26"%3E🔨%3C/text%3E%3C/svg%3E') 6 6, pointer;
+      transform: translateY(155px) scale(.82);
+      transform-origin: bottom center;
+      opacity: 0;
+      transition: transform .2s cubic-bezier(.2,.8,.3,1.25), opacity .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .target.up { transform: translateY(0) scale(1); opacity: 1; }
+    .target.hit { transform: translateY(16px) scale(.92) rotate(-6deg); filter: saturate(1.35); }
+    .target:focus-visible { outline: 5px solid var(--yellow); outline-offset: 2px; border-radius: 20px; }
+
+    .target img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 3px rgba(45,27,23,.25));
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .splash {
+      position: absolute;
+      z-index: 8;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(255,244,214,.84);
+      backdrop-filter: blur(5px);
+      transition: opacity .25s, visibility .25s;
+    }
+
+    .splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .start-card {
+      width: min(520px, 100%);
+      padding: clamp(24px, 5vw, 42px);
+      text-align: center;
+      border: 4px solid var(--ink);
+      border-radius: 28px 28px 34px 24px;
+      background: var(--paper);
+      box-shadow: 9px 10px 0 var(--ink);
+      transform: rotate(-1deg);
+    }
+
+    .start-card h2 {
+      margin: 0 0 8px;
+      font-family: 'Sriracha', cursive;
+      font-size: clamp(2rem, 7vw, 3.8rem);
+      line-height: 1;
+      color: var(--red-dark);
+    }
+
+    .start-card p { margin: 0 auto 22px; max-width: 390px; font-size: clamp(1rem, 2.6vw, 1.2rem); line-height: 1.65; }
+
+    .primary-btn {
+      position: relative;
+      min-width: 200px;
+      min-height: 58px;
+      padding: 10px 24px;
+      border: 3px solid var(--ink);
+      border-radius: 18px;
+      background: var(--yellow);
+      color: var(--ink);
+      font-size: 1.18rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 7px 0 var(--ink);
+      transition: transform .12s, box-shadow .12s;
+    }
+    .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 9px 0 var(--ink); }
+    .primary-btn:active { transform: translateY(6px); box-shadow: 0 1px 0 var(--ink); }
+    .primary-btn:focus-visible { outline: 4px solid var(--sky); outline-offset: 4px; }
+
+    .tip {
+      margin: 0;
+      text-align: center;
+      font-size: .93rem;
+      font-weight: 500;
+      color: #23472b;
+    }
+
+    .hit-pop {
+      position: fixed;
+      z-index: 30;
+      pointer-events: none;
+      color: #fff;
+      font-family: 'Sriracha', cursive;
+      font-size: 2rem;
+      text-shadow: 0 3px 0 var(--red-dark), 2px 0 0 var(--red-dark), -2px 0 0 var(--red-dark);
+      animation: pop-away .6s ease-out forwards;
+    }
+
+    @keyframes pop-away {
+      0% { transform: translate(-50%, -40%) scale(.5) rotate(-8deg); opacity: 0; }
+      35% { transform: translate(-50%, -85%) scale(1.2) rotate(5deg); opacity: 1; }
+      100% { transform: translate(-50%, -150%) scale(.9) rotate(-4deg); opacity: 0; }
+    }
+
+    .win-screen {
+      position: fixed;
+      z-index: 50;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(255,209,102,.92);
+      backdrop-filter: blur(9px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .35s, visibility .35s;
+    }
+    .win-screen.show { opacity: 1; visibility: visible; }
+
+    .win-card {
+      position: relative;
+      width: min(520px, 100%);
+      padding: 24px 24px 30px;
+      border: 4px solid var(--ink);
+      border-radius: 40px 30px 44px 32px;
+      background: var(--paper);
+      box-shadow: 11px 12px 0 var(--ink);
+      text-align: center;
+      animation: winner-in .55s cubic-bezier(.2,.85,.3,1.25) both;
+    }
+    @keyframes winner-in { from { transform: scale(.55) rotate(-8deg); opacity: 0; } to { transform: scale(1) rotate(1deg); opacity: 1; } }
+
+    .monkey-photo {
+      width: min(260px, 72vw);
+      aspect-ratio: 1;
+      border: 4px solid var(--ink);
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 8px 0 var(--red);
+    }
+    .win-card h2 { margin: 18px 0 4px; font-family: 'Sriracha', cursive; font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1.05; color: var(--red-dark); }
+    .win-card p { margin: 0 0 18px; font-size: 1.05rem; }
+
+    .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .confetti i { position: absolute; top: -24px; width: 12px; height: 22px; background: var(--red); animation: fall 2.8s linear infinite; }
+    .confetti i:nth-child(2n) { background: #56a86a; width: 18px; height: 12px; }
+    .confetti i:nth-child(3n) { background: #5baed7; border-radius: 50%; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    @media (max-width: 700px) {
+      .game-shell { width: min(100% - 18px, 600px); padding-top: 12px; align-content: start; }
+      .topbar { grid-template-columns: 1fr 1fr; }
+      .brand { grid-column: 1 / -1; text-align: center; }
+      .time { justify-self: start; }
+      .game-board { min-height: 590px; padding: 22px 12px 18px; grid-template-columns: repeat(2, 1fr); gap: 4px 10px; }
+      .hole { height: 175px; }
+      .target { height: 154px; width: 82%; }
+      .status-pill { min-width: 105px; padding: 7px 12px; }
+    }
+
+    @media (max-width: 390px) {
+      .game-board { min-height: 540px; }
+      .hole { height: 158px; }
+      .target { height: 140px; width: 92%; }
+      .start-card { padding: 24px 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar" aria-label="สถานะเกม">
+      <h1 class="brand">ป๊อก! ตีให้ทัน</h1>
+      <div class="status-pill time"><span>เวลา</span><strong id="time">30</strong><span>วิ</span></div>
+      <div class="status-pill score"><span>แต้ม</span><strong id="score">0</strong><span>/ 12</span></div>
+    </header>
+
+    <section class="board-wrap" aria-label="กระดานเกมตีตุ่น">
+      <div class="game-board" id="board">
+        <div class="hole"><button class="target" type="button" aria-label="ตีตัวละครช่องที่ 1"><img alt="" draggable="false" /></button></div>
+        <div class="hole"><button class="target" type="button" aria-label="ตีตัวละครช่องที่ 2"><img alt="" draggable="false" /></button></div>
+        <div class="hole"><button class="target" type="button" aria-label="ตีตัวละครช่องที่ 3"><img alt="" draggable="false" /></button></div>
+        <div class="hole"><button class="target" type="button" aria-label="ตีตัวละครช่องที่ 4"><img alt="" draggable="false" /></button></div>
+        <div class="hole"><button class="target" type="button" aria-label="ตีตัวละครช่องที่ 5"><img alt="" draggable="false" /></button></div>
+        <div class="hole"><button class="target" type="button" aria-label="ตีตัวละครช่องที่ 6"><img alt="" draggable="false" /></button></div>
+
+        <div class="splash" id="splash">
+          <div class="start-card">
+            <h2 id="splash-title">พร้อมป๊อกยัง?</h2>
+            <p id="splash-text">ตีสองจอมป่วนให้ได้ <strong>12 ครั้ง</strong> ภายใน 30 วินาที แล้วจะมีคนพิเศษมาชม!</p>
+            <button class="primary-btn" id="start-btn" type="button">เริ่มเล่นเลย 🔨</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <p class="tip">แตะตัวที่โผล่ขึ้นมา • ใช้ปุ่ม Tab + Enter ก็เล่นได้</p>
+  </main>
+
+  <section class="win-screen" id="win-screen" role="dialog" aria-modal="true" aria-labelledby="win-title">
+    <div class="confetti" aria-hidden="true"></div>
+    <div class="win-card">
+      <img class="monkey-photo" src="assets/monkey.png" alt="ลิงยกนิ้วหัวใจสองข้าง" />
+      <h2 id="win-title">เก่งมากค้าบเบ้บ......</h2>
+      <p>ตีครบ <strong id="final-score">12</strong> ครั้งแล้ว เยี่ยมที่สุดเลย!</p>
+      <button class="primary-btn" id="again-btn" type="button">เล่นอีกรอบ 💛</button>
+    </div>
+  </section>
+
+  <script>
+    const targets = [...document.querySelectorAll('.target')];
+    const scoreEl = document.getElementById('score');
+    const timeEl = document.getElementById('time');
+    const splash = document.getElementById('splash');
+    const splashTitle = document.getElementById('splash-title');
+    const splashText = document.getElementById('splash-text');
+    const startBtn = document.getElementById('start-btn');
+    const winScreen = document.getElementById('win-screen');
+    const againBtn = document.getElementById('again-btn');
+    const finalScore = document.getElementById('final-score');
+    const characters = ['assets/cutie-1.png', 'assets/cutie-2.png'];
+    const GOAL = 12;
+    const DURATION = 30;
+
+    let score = 0;
+    let seconds = DURATION;
+    let running = false;
+    let activeTarget = null;
+    let popTimer = null;
+    let clockTimer = null;
+    let lastIndex = -1;
+    let audioContext = null;
+
+    function tone(frequency, duration, type = 'sine', volume = .08) {
+      try {
+        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + duration);
+        oscillator.connect(gain).connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + duration);
+      } catch (_) {}
+    }
+
+    function hideTarget() {
+      if (!activeTarget) return;
+      activeTarget.classList.remove('up', 'hit');
+      activeTarget = null;
+    }
+
+    function nextTarget() {
+      if (!running) return;
+      hideTarget();
+      let index;
+      do index = Math.floor(Math.random() * targets.length); while (index === lastIndex);
+      lastIndex = index;
+      activeTarget = targets[index];
+      const image = activeTarget.querySelector('img');
+      image.src = characters[Math.floor(Math.random() * characters.length)];
+      activeTarget.dataset.hit = 'false';
+      activeTarget.classList.add('up');
+      const visibleFor = Math.max(440, 880 - score * 24);
+      popTimer = setTimeout(nextTarget, visibleFor);
+    }
+
+    function showHitPop(target) {
+      const rect = target.getBoundingClientRect();
+      const pop = document.createElement('span');
+      pop.className = 'hit-pop';
+      pop.textContent = ['ป๊อก!', 'โป๊ก!', 'โดนแล้ว!', '+1'][Math.floor(Math.random() * 4)];
+      pop.style.left = `${rect.left + rect.width / 2}px`;
+      pop.style.top = `${rect.top + rect.height * .35}px`;
+      document.body.appendChild(pop);
+      pop.addEventListener('animationend', () => pop.remove());
+    }
+
+    function hit(event) {
+      const target = event.currentTarget;
+      if (!running || !target.classList.contains('up') || target.dataset.hit === 'true') return;
+      target.dataset.hit = 'true';
+      target.classList.add('hit');
+      score += 1;
+      scoreEl.textContent = score;
+      showHitPop(target);
+      tone(165 + score * 9, .12, 'square', .065);
+      clearTimeout(popTimer);
+      if (score >= GOAL) {
+        endGame(true);
+      } else {
+        setTimeout(nextTarget, 155);
+      }
+    }
+
+    function makeConfetti() {
+      const holder = document.querySelector('.confetti');
+      holder.replaceChildren();
+      for (let i = 0; i < 24; i++) {
+        const piece = document.createElement('i');
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.animationDelay = `${Math.random() * 2.2}s`;
+        piece.style.animationDuration = `${2 + Math.random() * 1.7}s`;
+        holder.appendChild(piece);
+      }
+    }
+
+    function endGame(won) {
+      running = false;
+      clearTimeout(popTimer);
+      clearInterval(clockTimer);
+      hideTarget();
+      if (won) {
+        finalScore.textContent = score;
+        makeConfetti();
+        winScreen.classList.add('show');
+        tone(523, .2, 'sine', .09);
+        setTimeout(() => tone(659, .22, 'sine', .09), 170);
+        setTimeout(() => tone(784, .38, 'sine', .1), 340);
+        setTimeout(() => againBtn.focus(), 450);
+      } else {
+        splashTitle.textContent = 'เกือบแล้ว อีกนิดเดียว!';
+        splashText.innerHTML = `รอบนี้ได้ <strong>${score} แต้ม</strong> ลองอีกที รับรองทันแน่`;
+        startBtn.textContent = 'ลองใหม่อีกครั้ง 🔨';
+        splash.classList.remove('hidden');
+        startBtn.focus();
+      }
+    }
+
+    function startGame() {
+      score = 0;
+      seconds = DURATION;
+      running = true;
+      scoreEl.textContent = '0';
+      timeEl.textContent = seconds;
+      winScreen.classList.remove('show');
+      splash.classList.add('hidden');
+      clearTimeout(popTimer);
+      clearInterval(clockTimer);
+      tone(330, .11, 'triangle', .06);
+      setTimeout(nextTarget, 260);
+      clockTimer = setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = seconds;
+        if (seconds <= 5 && seconds > 0) tone(220, .08, 'square', .035);
+        if (seconds <= 0) endGame(false);
+      }, 1000);
+    }
+
+    targets.forEach(target => target.addEventListener('click', hit));
+    startBtn.addEventListener('click', startGame);
+    againBtn.addEventListener('click', startGame);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && winScreen.classList.contains('show')) startGame();
+    });
+  </script>
+</body>
+</html>
